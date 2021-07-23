@@ -1,162 +1,55 @@
-import numpy as np 
-import matplotlib.pyplot as plt 
+"""
+**IF THERE IS A FUNCTION YOU CAN'T FIND THE FUNCTION ITS PROBABLY PLACED IN THE UTILITIES**
+"""
+# Imports 
+import numpy as np
+from utilities import *
+import os
+import hh
 
-# Define global variables
-J = 3.62*(10 ** (-8))
-tstep = .00025
-cLen = 1.5*(10 ** (-2))
-cWid = 1.3*(10 ** (-3))
-intraConduct = (1.0/18)*(cLen ** 3)
-sArea = 2*(cWid ** 2) + 4*(cWid*cLen) 
-cVol = cLen*(cWid ** 2)
-
-# defines derivative matrix, inputs vector length and 
-# step size for the derivative
-
-def derivMatrix(n, l):
-	mat = np.zeros((n,n))
-	for i in range(n-1):
-		mat[i, i] = -1
-		mat[i, i+1] = 1
-	mat[n-1, n-2] = 1
-	mat[n-1, n-1] = -1
-	mat = (1.0/l)*mat
-	return mat
-
-# defines the membrane operator, inputs the number of 
-# total nodes, should be even since same number of int/ext
-# nodes. Returns phi_i - phi_e 
-
-def membraneOp(n):
-	k = int(n/2.0)
-	mat = np.zeros((k, n))
-	for i in range(k):
-		mat[i, i] = 1
-		mat[i, i+k] = -1
-	return mat
-
-#defines projection onto first n coordinates. Allows for 
-#us to apply operations solely to phi_i 
-
-def intProj(n):
-	k = int(n/2)
-	mat = np.zeros((k, n))
-	for i in range(k):
-		mat[i,i] = 1
-	return mat
-
-#defines projection for second n coordinates, similar to above
-
-def extProj(n):
-	k = int(n/2)
-	mat = np.zeros((k, n))
-	for i in range(k):
-		mat[i, i + k] = 1
-	return mat
-
-#defines gap junctional operator. Inputs constant for surface 
-#average of g_{in}(y).
-
-def gapJuncOp(n, g):
-	k = int(n/2)
-	mat = np.zeros((k, n))
-	mat[0,0] = 1
-	mat[0,1] = -1
-	mat[k-1, k-2] = -1
-	mat[k-1, k-1] = 1
-	for i in range(1, k-1):
-		mat[i, i-1] = -1
-		mat[i, i] = 2
-		mat[i, i+1] = -1
-	mat = (g/sArea)*mat
-	return mat
-
-#Creates a matrix for taking the second derivative, l is 
-#delta_x
-
-def secDerivMat(n, l):
-	mat = np.zeros((n,n))
-	mat[0,0] = -1
-	mat[0,1] = 1
-	mat[n-1, n-2] = 1
-	mat[n-1, n-1] = -1
-	for i in range(1, n-1):
-		mat[i, i-1] = -1
-		mat[i, i] = 2
-		mat[i, i+1] = -1
-	mat = ((1.0/l)**2)*mat
-	return mat
+# Prints the arrays properly with elements as X.YYY
+np.set_printoptions(precision=3)
 
 
+def create_strand(n_cells):
+    # Creating a strand representing n cells
+    # The extracellular space is initially at a potential of   0 mV 
+    # The strand is [phi_i phi_e]
+    strand = np.zeros(n_cells*2)
+    # The intracellular space is initially at a potential of -70 mV
+    strand[:n_cells] += -70
+    return strand 
+     
+def create_laplace_matrix(V, c):
+    L = []
+    return L
 
-#inputs a float and a number a that determines the root of the cubic 
-
-def pointIon(x, a):
-	return x*(a-x)*(x-1)
-
-#to compute how the nodes change with a timestep we consider the process 
-#as three steps. Given nodes we transform them with a matrix, then add
-#the ionic current, then transform them with an inverse matrix.
-#this function defines the matrix used in the first node transformation. 
-
-def firstStep(nodes, xstep, gap):
-	n = len(nodes)
-	k = int(n/2)
-	timeStepMat = (1/tstep)*membraneOp(n)
-	intracellOp = (0.5)*(1.0/sArea)*(intraConduct)*(secDerivMat(k, xstep).dot(intProj(n)))
-	extracellOp = (0.5)*(1.0/sArea)*(J)*(secDerivMat(k, xstep).dot(derivMatrix(k, xstep))).dot(extProj(n))
-	upper = timeStepMat + intracellOp - (0.5)*gapJuncOp(n, gap)
-	lower = timeStepMat + extracellOp 
-	mat = np.concatenate((upper, lower))
-	return mat
+def generate_ionic_current(V, A, delta_t):
+    V_send = np.matmul(A, V)
+    V_send = np.add(V_send, 70)
+    I_ion = hh.HodgkinHuxley().main(flat(V_send))
+    return 1000*delta_t*np.asarray(I_ion) 
 
 
-#inverseStep creates the matrix that we need to invert. We however will not invert the 
-#matrix due to stability issues.
+def simulate(strand, L):
+    i = 0
+ 
 
-def inverseStep(nodes, xstep):
-	n = len(nodes)
-	k = int(n/2)
-	intracellOp = (0.5)*(1/sArea)*(intraConduct)*(secDerivMat(k, xstep).dot(intProj(n)))
-	extracellOp = (0.5)*(1/sArea)*(J)*(secDerivMat(k, xstep).dot(derivMatrix(k,xstep))).dot(extProj(n))
-	upperMat = (1/tstep)*membraneOp(n) - intracellOp + (0.5)*gapJuncOp(n, 259)
-	lowerMat = (1/tstep)*membraneOp(n) -  extracellOp
-	operator = np.concatenate((upperMat,lowerMat))
-	if np.linalg.matrix_rank(operator) >= n-1:
-		for i in range(n):
-			operator[n-1, i] = 1
-		return operator
-	else:
-		print('Operator of Insufficient Rank')
-
-#defines the nodes to be .05, -.05 at either end. #TODO : Verify why it says .05  
-#buids the diffusive piece. Defines inv as the 
-#matrix to be solved. In the for-loop we iterate over 20 time steps
-#solves equation inv(nodes) = firstStep(nodes) + ionic(nodes)
 def main():
+    # Create the strand first
+    n_cells = 10
+    strand = create_strand(n_cells)
 
-	length = 100
-	nodes = -.08*np.ones(length) # array of 1s with length 100
-	# nodes = -.08*nodes # array of -0.08
-	nodes[0] = .2
-	nodes[int(length/2)] = -.2
-	totalCurr = np.sum(nodes)
-	diffusivePiece = firstStep(nodes, cLen, 259)
-	inv = inverseStep(nodes, 1)
-	vecIon = np.vectorize(pointIon)
-	print(nodes)
-	plt.plot(nodes)
-	for _ in range(20):
-		ionic = vecIon(nodes, .6)
-		ionic[length-1] = 0
-		step = diffusivePiece.dot(nodes) 
-		#step[length-1] = totalCurr
-		nodes = np.linalg.solve(inv, step)
-		print(nodes)
-		print(np.sum(nodes))
-		plt.plot(nodes)
-	plt.show()
 
+    # create our laplacian matrices
+
+    # Merge the Laplacian matrices 
+    # We do this to to unify all of our variables to make it easy to keep track off of 
+
+    # Simulate
+
+    os.system("ffmpeg -y -i 'foo%03d.jpg' bidomain.mp4")
+    os.system("rm -f *.jpg")
 
 if __name__ == '__main__':
-	main()
+    main()
