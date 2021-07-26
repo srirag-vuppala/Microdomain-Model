@@ -81,7 +81,7 @@ def generate_Z_matrix(n_cells, delta_x):
     Z += np.diagflat(np.ones(n_cells - 2) * -1, -2)  # create diagonal below sub diagonal of -1's
     zero = np.zeros([n_cells, n_cells])
     Z = np.concatenate((zero, Z), axis=1)  # horizontally concatenate zero matrix and Z
-    Z *= 2/delta_x**3
+    Z *= 1/(2*delta_x**3)
     return Z
 
 def simulate(strand, L):
