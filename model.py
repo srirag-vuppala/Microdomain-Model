@@ -19,15 +19,11 @@ def create_strand(n_cells):
     # The intracellular space is initially at a potential of -70 mV
     strand[:n_cells] += -70
     return strand 
-     
-def create_laplace_matrix(V, c):
-    L = []
-    return L
 
 def generate_ionic_current(V, A, delta_t):
     V_send = np.matmul(A, V)
     V_send = np.add(V_send, 70)
-    I_ion = hh.HodgkinHuxley().main(flat(V_send))
+    I_ion = hh.HodgkinHuxley().main(V_send)
     return 1000*delta_t*np.asarray(I_ion) 
 
 
