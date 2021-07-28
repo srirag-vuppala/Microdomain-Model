@@ -88,6 +88,8 @@ def main():
     n_cells = 10
     strand = create_strand(n_cells)
 
+    matprint(generate_E_matrix(10))
+
     # create our laplacian matrices
 
     # Merge the Laplacian matrices 
@@ -96,8 +98,8 @@ def main():
     # Simulate
 
 
-    os.system("ffmpeg -y -i 'foo%03d.jpg' bidomain.mp4")
-    os.system("rm -f *.jpg")
+    # os.system("ffmpeg -y -i 'foo%03d.jpg' bidomain.mp4")
+    # os.system("rm -f *.jpg")
 
 
 if __name__ == '__main__':
