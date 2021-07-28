@@ -22,8 +22,9 @@ def create_B_83(delta_x, n_nodes, S, delta_t , integral):
 def create_Z(delta_x, n_nodes):
     L_3 = create_L_3(delta_x, n_nodes)
     zero = np.zeros([n_nodes, n_nodes])
-    '''matrix should look like [ 0 L3]'''
-    return np.concatenate((L_3, zero), axis=1) 
+    '''matrix should look like [ 0 L3], pretty sure its incorrect in the coding prep since it should be third 
+    derivative of phi_e '''
+    return np.concatenate((zero, L_3), axis=1)
 
 def create_C(n_nodes):
     E = create_E(n_nodes)
@@ -44,7 +45,7 @@ def create_A(delta_x, n_nodes):
 def create_B(n_nodes):
     """ B = [I -I] """
     '''second identity matrix should be negative'''
-    return np.concatenate((np.identity(n_nodes), np.identity(n_nodes)), axis=1)
+    return np.concatenate((np.identity(n_nodes), np.negative(np.identity(n_nodes))), axis=1)
     
 
 def create_L_2(delta_x, n_nodes ):
