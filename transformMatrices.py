@@ -21,7 +21,8 @@ def create_B_83(delta_x, n_nodes, S, delta_t , integral):
 
 def create_Z(delta_x, n_nodes):
     L_3 = create_L_3(delta_x, n_nodes)
-    zero = np.zeros([n_nodes, n_nodes]) 
+    zero = np.zeros([n_nodes, n_nodes])
+    '''matrix should look like [ 0 L3]'''
     return np.concatenate((L_3, zero), axis=1) 
 
 def create_C(n_nodes):
@@ -30,6 +31,7 @@ def create_C(n_nodes):
     return np.concatenate((E, zero), axis=1)
 
 def create_E(n_nodes):
+    '''this doesn't generate the desired E matrix, there should be 1's at the corners of the matrix'''
     return np.diagflat([2 for _ in range(n_nodes)], 0) + np.diagflat([-1 for _ in range(n_nodes-1)], -1) + np.diagflat([-1 for _ in range(n_nodes-1)], 1)
 
 
@@ -41,6 +43,7 @@ def create_A(delta_x, n_nodes):
 
 def create_B(n_nodes):
     """ B = [I -I] """
+    '''second identity matrix should be negative'''
     return np.concatenate((np.identity(n_nodes), np.identity(n_nodes)), axis=1)
     
 
