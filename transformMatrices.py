@@ -32,8 +32,10 @@ def create_C(n_nodes):
     return np.concatenate((E, zero), axis=1)
 
 def create_E(n_nodes):
-    '''this doesn't generate the desired E matrix, there should be 1's at the corners of the matrix'''
-    return np.diagflat([2 for _ in range(n_nodes)], 0) + np.diagflat([-1 for _ in range(n_nodes-1)], -1) + np.diagflat([-1 for _ in range(n_nodes-1)], 1)
+    E = np.diagflat([2 for _ in range(n_nodes)], 0) + np.diagflat([-1 for _ in range(n_nodes-1)], -1) + np.diagflat([-1 for _ in range(n_nodes-1)], 1)
+    E[0][0] = 1
+    E[-1][-1] = 1
+    return E
 
 
 def create_A(delta_x, n_nodes):
