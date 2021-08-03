@@ -81,14 +81,20 @@ def generate_Z_matrix(n_cells, delta_x):
     return Z
 
 def simulate(A, B, strand, S ):
-    phi_n = strand
+    phi_now = strand
     for i in range(1000):
-        left_term = np.matmul(B, phi_n)
-        right_term = generate_ionic_current(phi_n, delta_t)/S
-        soln_term = left_term - right_term
+        # stimulus
+        if i < 5:
+            phi_now[0] = -40
+            phi_now[-1] = -40
+        left_term = np.matmul(B, phi_now)
+        right_term = generate_ionic_current(phi_now, ...)/S
+        soln_term = left_term + right_term
+        phi_next = np.linalg.solve(A, soln_term)
 
-        #3 
-        V_new = np.linalg.solve(V_new_coeff, soln_term)
+        # set up for next iteration 
+        phi_now = phi_next
+
 
 
 
