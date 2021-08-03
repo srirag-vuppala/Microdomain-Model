@@ -1,6 +1,16 @@
 import numpy as np
 
 
+def create_A_84(delta_x, n_nodes, J, S, delta_t):
+    Z = create_Z(delta_x, n_nodes)
+    B = create_B(n_nodes)
+    return (J/S) * Z - (1/delta_t) * B
+
+def create_B_84(delta_x, n_nodes, J, S, delta_t):
+    Z = create_Z(delta_x, n_nodes)
+    B = create_B(n_nodes)
+    return (-1/delta_t) * B - (J/S) * Z
+
 def create_A_83(delta_x, n_nodes, S, delta_t):
     """ The coeff matrix of the LHS in 83"""
     A = create_A(delta_x, n_nodes)
