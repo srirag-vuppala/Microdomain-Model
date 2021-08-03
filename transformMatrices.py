@@ -84,8 +84,11 @@ def create_L_3(delta_x, n_nodes):
     return L
 
 def main():
-    print(create_B(5))
-    print(create_A(5, 5))
+    print(generate_E_matrix(5))
+    print(create_E(5))
+    print(create_C(5))
+
+
 
 if __name__ == '__main__':
     main()

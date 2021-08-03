@@ -4,6 +4,7 @@
 # Imports 
 import numpy as np
 from utilities import *
+from transformMatrices import *
 import os
 import hh
 
@@ -79,24 +80,45 @@ def generate_Z_matrix(n_cells, delta_x):
     Z *= 1/(2*delta_x**3)
     return Z
 
-def simulate(strand, L):
-    i = 0
+def simulate(A, B, strand, S ):
+    phi_n = strand
+    for i in range(1000):
+        left_term = np.matmul(B, phi_n)
+        right_term = generate_ionic_current(phi_n, delta_t)/S
+        soln_term = left_term - right_term
+
+        #3 
+        V_new = np.linalg.solve(V_new_coeff, soln_term)
+
+
 
 
 def main():
+    # Prep work 
     # Create the strand first
     n_cells = 10
     strand = create_strand(n_cells)
+    delta_x = 0.01
+    delta_t = 0.01
+    J = 0.1
+    S = 0.1
 
-    matprint(generate_E_matrix(10))
 
-    # create our laplacian matrices
+    #TODO : make sure the integral is proper
+    integral = 0.1
 
-    # Merge the Laplacian matrices 
-    # We do this to to unify all of our variables to make it easy to keep track off of 
+    A_84 = create_A_84(delta_x, n_cells, J, S, delta_t)
+    B_84 = create_B_84(delta_x, n_cells, J, S, delta_t)
+    A_83 = create_A_83(delta_x, n_cells, S, delta_t)
+    B_83 = create_B_83(delta_x, n_cells, S, delta_t, integral)
+
+    A_comb = np.concatenate(A_83, A_84)
+    B_comb = np.concatenate(B_83, B_84)
+
+    combined_strand = np.concatenate(strand, strand)
 
     # Simulate
-
+    simulate(A_comb, B_comb, combined_strand, S)
 
     # os.system("ffmpeg -y -i 'foo%03d.jpg' bidomain.mp4")
     # os.system("rm -f *.jpg")
