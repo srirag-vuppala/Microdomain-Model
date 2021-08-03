@@ -5,5 +5,7 @@ Notes for the microdomain model
 2. How do we compute gap junctional resistance?
 3. I think generate_E_matrix correctly generates E compared to create_E
     - Comparing to the notes we've made we defined C = [E 0] but the generate_E_matrix essentially makes the C matrix.
+    - Yeah my bad create_E and create_C look good, I'm down to ditch the generate matrices functions since they
+   do the same stuff as the create matrices functions
 4. I think we still need to incorporate the gap junctional term as a diffusion term?
 
