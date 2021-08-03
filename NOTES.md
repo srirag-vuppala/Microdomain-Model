@@ -8,4 +8,5 @@ Notes for the microdomain model
     - Yeah my bad create_E and create_C look good, I'm down to ditch the generate matrices functions since they
    do the same stuff as the create matrices functions
 4. I think we still need to incorporate the gap junctional term as a diffusion term?
+5. Why do we add constant to first and last entries of L3 matrix?
 
