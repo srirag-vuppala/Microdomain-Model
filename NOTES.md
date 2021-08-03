@@ -9,4 +9,6 @@ Notes for the microdomain model
    do the same stuff as the create matrices functions
 4. I think we still need to incorporate the gap junctional term as a diffusion term?
 5. Why do we add constant to first and last entries of L3 matrix?
+6. gin = 666 mS/cm^2, to non-dimensionalize this it looks like we need to muliplty
+by Rm, which is defined on p. 10 of weston's thesis ** ask dr. lin **
 
