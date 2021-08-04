@@ -11,13 +11,15 @@ def create_B_84(delta_x, n_nodes, J, S, delta_t):
     B = create_B(n_nodes)
     return (-1/delta_t) * B - (J/S) * Z
 
-def create_A_83(delta_x, n_nodes, S, delta_t):
+def create_A_83(delta_x, n_nodes, S, delta_t, integral):
     """ The coeff matrix of the LHS in 83"""
     A = create_A(delta_x, n_nodes)
     lhs = A/(2*S)
     B = create_B(n_nodes)
     rhs = B/delta_t
-    return lhs - rhs
+    C = create_C(n_nodes)
+    G = integral * C
+    return lhs - rhs - G/(2*S)
 
 def create_B_83(delta_x, n_nodes, S, delta_t , integral):
     """ The coeff matrix of the RHS in 83"""
@@ -26,7 +28,7 @@ def create_B_83(delta_x, n_nodes, S, delta_t , integral):
     A = create_A(delta_x, n_nodes)
     term_2 = A/(2*S)
     C = create_C(n_nodes)
-    term_3 = (integral*C)/S
+    term_3 = (integral*C)/(2*S)
     return term_3 - term_1 - term_2
 
 def create_Z(delta_x, n_nodes):

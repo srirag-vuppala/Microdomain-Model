@@ -15,7 +15,6 @@ V_K = -12.0
 V_L = 10.6
 """Leak current Diffusion potentials, in mV"""
 
-
 def alpha_n(v):
     return 0.1 * ((10 - v) / (np.exp((10 - v) / 10) - 1))
 
