@@ -3,6 +3,8 @@
 """
 # Imports 
 import numpy as np
+
+from integral import generate_integral
 from utilities import *
 from transformMatrices import *
 import os
@@ -108,14 +110,14 @@ def main():
     delta_t = 0.01
     J = 0.1
     S = 0.1
-
+    v_resting = -70
 
     #TODO : make sure the integral is proper
-    integral = 0.1
+    integral = generate_integral(v_resting)
 
     A_84 = create_A_84(delta_x, n_cells, J, S, delta_t)
     B_84 = create_B_84(delta_x, n_cells, J, S, delta_t)
-    A_83 = create_A_83(delta_x, n_cells, S, delta_t)
+    A_83 = create_A_83(delta_x, n_cells, S, delta_t, integral)
     B_83 = create_B_83(delta_x, n_cells, S, delta_t, integral)
 
     A_comb = np.concatenate(A_83, A_84)
