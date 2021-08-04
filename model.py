@@ -120,13 +120,14 @@ def main():
     A_83 = create_A_83(delta_x, n_cells, S, delta_t, integral)
     B_83 = create_B_83(delta_x, n_cells, S, delta_t, integral)
 
-    A_comb = np.concatenate(A_83, A_84)
-    B_comb = np.concatenate(B_83, B_84)
+    A_comb = np.concatenate((A_83, A_84))
+    B_comb = np.concatenate((B_83, B_84))
 
-    combined_strand = np.concatenate(strand, strand)
+    """Shouldn't need to stack two strands, that makes our vector [phi_i phi_e phi_i phi_e]"""
+    #combined_strand = np.concatenate((strand, strand))
 
     # Simulate
-    simulate(A_comb, B_comb, combined_strand, S)
+    simulate(A_comb, B_comb, strand, S)
 
     # os.system("ffmpeg -y -i 'foo%03d.jpg' bidomain.mp4")
     # os.system("rm -f *.jpg")
