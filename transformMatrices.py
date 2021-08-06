@@ -74,7 +74,10 @@ def create_L_3(delta_x, n_nodes):
     # Defining the boundary conditions
     # TODO Make sure this is right 
     # Maybe boundary conditions are unnecessary since the laplacian already fits our checks?
-
+    L[0][0] = constant
+    L[1][1] = constant
+    L[n_nodes-2][n_nodes-2] = constant
+    L[-1][-1] = constant
     # L[0][0] = constant
     # L[-1][-1] = constant
     return L

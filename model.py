@@ -9,6 +9,7 @@ from utilities import *
 from transformMatrices import *
 import os
 import hh
+import matplotlib.pyplot as plt
 
 # Prints the arrays properly with elements as X.YYY
 np.set_printoptions(precision=3)
@@ -30,6 +31,9 @@ def generate_ionic_current(V, A, delta_t):
     I_ion = hh.HodgkinHuxley().main(flat(V_send))
     return 1000 * delta_t * np.asarray(I_ion)
 
+def generate_ionic_dummy(v):
+    return np.asarray(hh.HodgkinHuxley().main(v))
+
 
 def simulate(A, B, strand, n_cells):
     phi_now = strand
@@ -37,11 +41,22 @@ def simulate(A, B, strand, n_cells):
     for i in range(1000):
         # stimulus
         if i < 5:
-            phi_now[0] = -40
+            phi_now[n_cells]=40
             phi_now[-1] = -40
+        if i < 10:
+            plt.figure(i%100 + 1)
+            plt.scatter(np.arange(1, 11, 1), np.matmul(create_B(10), phi_now))
+            plt.xlabel('Node')
+            plt.ylabel('Transmembrane Potential')
+            plt.title('time = ' + str(i/100))
+            plt.savefig('timestep'+str(i)+'.jpg')
+            plt.clf()
+            print(np.linalg.matrix_rank(A))
         left_term = np.matmul(B, phi_now)
-        right_term = generate_ionic_current(phi_now, ...)
-        soln_term = left_term + right_term
+        #right_term = generate_ionic_current(phi_now, ...)
+        #right_term = generate_ionic_dummy(phi_now)
+        #soln_term = left_term + right_term
+        soln_term = left_term
         phi_next = np.linalg.solve(A, soln_term)
 
         # set up for next iteration 
@@ -72,8 +87,8 @@ def main():
     # Simulate
     simulate(A_comb, B_comb, strand, n_cells)
 
-    # os.system("ffmpeg -y -i 'foo%03d.jpg' bidomain.mp4")
-    # os.system("rm -f *.jpg")
+    os.system("ffmpeg -y -i 'foo%03d.jpg' microdomain.mp4")
+    os.system("rm -f *.jpg")
 
 
 if __name__ == '__main__':
