@@ -68,7 +68,7 @@ def main():
     n_cells = 10
     delta_x = 0.01
     delta_t = 0.01
-    J = 0.1
+    J = 0.1 # TODO find this 
     S = 0.1
     phi_resting = -70
     strand = create_strand(n_cells, phi_resting)
