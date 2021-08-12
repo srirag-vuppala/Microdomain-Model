@@ -74,28 +74,27 @@ def create_L_3(delta_x, n_nodes):
     # Defining the boundary conditions
     # TODO Make sure this is right 
     L[0][0] = constant
-    L[1][1] = constant
+    L[1][1] = -constant
     L[n_nodes-2][n_nodes-2] = constant
-    L[-1][-1] = constant
+    L[-1][-1] = -constant
     return L
 
 def check_laplace_matrix(L):
     # I might be checking this wrong
     # Each row's elements sum should be = 0
-    # Each column's elements sum should be = 0
     # Thus total sum of all elements should be 0 too 
-    tsum = 0
     for arr in L:
-        for i in arr:
-            tsum += i
-    if tsum == 0:
-        print("yay it works")    
-    else:
-        print("Try again")
+        if sum(arr)== 0:
+            print("yay it works")    
+        else:
+            print("Try again")
+            print(arr)
 
 def main():
     L2 = create_L_2(0.01, 10)
     L3 = create_L_3(0.01, 10)
+    # check_laplace_matrix(L2)
+    check_laplace_matrix(L3)
     matprint(L2)
     matprint(L3)
     
