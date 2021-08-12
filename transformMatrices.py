@@ -51,7 +51,11 @@ def create_A(delta_x, n_nodes):
 
 def create_B(n_nodes):
     """ B = [I -I] """
-    return np.concatenate((np.identity(n_nodes), np.negative(np.identity(n_nodes))), axis=1)
+    neg = -1*(np.identity(n_nodes))
+    B = np.concatenate((np.identity(n_nodes), neg ), axis=1)
+    B = np.where(B == -0,0, B )
+    return B
+                
     
 
 def create_L_2(delta_x, n_nodes ):
@@ -97,6 +101,7 @@ def main():
     check_laplace_matrix(L3)
     matprint(L2)
     matprint(L3)
+    matprint(create_B(10))
     
 if __name__ == '__main__':
     main()
