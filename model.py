@@ -39,22 +39,21 @@ def simulate(A, B, strand, n_cells):
     phi_now = strand
     transmembrane_transform = create_B(n_cells)
 
-    #replacement_row = np.ones(n_cells*2)
-   # replacement_row[n_cells+1:] = 0
-    #A[1] = replacement_row
+    replacement_row = np.ones(n_cells*2)
+    replacement_row[n_cells+1:] = 0
+    A[0] = replacement_row
     #print(replacement_row)
 
     print(np.linalg.matrix_rank(A))
 
-    for i in range(100):
+    for i in range(1000):
         # stimulus
         if i < 5:
             # phi_now[0] = -70
             # phi_now[n_cells-1] = -70
             phi_now[n_cells] = -40
             phi_now[-1] = 40
-        if i < 100:
-            plt.figure(i%100 + 1)
+        if i < 200:
             # plt.scatter(np.arange(1, 11, 1), np.matmul(create_B(n_cells), phi_now))
             phi_trans = np.matmul(transmembrane_transform, phi_now)
             plt.plot(np.arange(1, n_cells+1, 1), phi_trans)
@@ -75,12 +74,12 @@ def simulate(A, B, strand, n_cells):
         #right_term = generate_ionic_dummy(phi_now)
         #soln_term = left_term + right_term
         soln_term = RHS_left_term
-        #soln_term[1] = 1
-        #phi_next = np.linalg.solve(A, soln_term)
-        phi_next = np.linalg.lstsq(A, soln_term)
+        soln_term[0] = 1
+        phi_next = np.linalg.solve(A, soln_term)
+        #phi_next = np.linalg.lstsq(A, soln_term)
 
         # set up for next iteration 
-        phi_now = phi_next[0]
+        phi_now = phi_next
 
 def main():
     # Prep work 
