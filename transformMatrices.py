@@ -2,15 +2,15 @@ import numpy as np
 from utilities import *
 
 
-def create_A_84(delta_x, n_nodes, J, S, delta_t):
+def create_A_84(delta_x, n_nodes, J, S, delta_t, sigma):
     Z = create_Z(delta_x, n_nodes)
     B = create_B(n_nodes)
-    return (J*Z) - (S*B/delta_t) 
+    return (J*Z*sigma) - (S*B/delta_t) 
 
-def create_B_84(delta_x, n_nodes, J, S, delta_t):
+def create_B_84(delta_x, n_nodes, J, S, delta_t, sigma):
     Z = create_Z(delta_x, n_nodes)
     B = create_B(n_nodes)
-    return (-S*B/delta_t) - (J*Z)
+    return (-S*B*sigma/delta_t) - (J*Z)
 
 def create_A_83(delta_x, n_nodes, S, delta_t, integral):
     """ The coeff matrix of the LHS in 83"""
@@ -82,6 +82,10 @@ def create_L_3(delta_x, n_nodes):
     L[n_nodes-2][n_nodes-2] = constant
     L[-1][-1] = -constant
     return L
+
+def create_sigma(cell_len):
+    const = 2*(cell_len**3)/36
+    return const
 
 def check_laplace_matrix(L):
     # I might be checking this wrong

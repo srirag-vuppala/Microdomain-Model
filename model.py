@@ -38,16 +38,15 @@ def generate_ionic_dummy(v):
 def simulate(A, B, strand, n_cells):
     phi_now = strand
     transmembrane_transform = create_B(n_cells)
-     
 
-    for i in range(1000):
+    for i in range(100):
         # stimulus
-        if i < 5:
+        if i < 1:
             # phi_now[0] = -70
             # phi_now[n_cells-1] = -70
             phi_now[n_cells] = -40
             phi_now[-1] = 40
-        if i < 10:
+        if i < 100:
             plt.figure(i%100 + 1)
             # plt.scatter(np.arange(1, 11, 1), np.matmul(create_B(n_cells), phi_now))
             phi_trans = np.matmul(transmembrane_transform, phi_now)
@@ -59,47 +58,53 @@ def simulate(A, B, strand, n_cells):
             plt.clf()
             print(phi_trans)
         RHS_left_term = np.matmul(B, phi_now)
-        if i == 0:
+        # if i == 0:
             # phi_trans[-1] = 1 | setting a control to prevent blowup ?
-            # left_term[n_cells-1] = 1
-            RHS_left_term[-1] = 1
-            A[-1] = 1
+            # RHS_left_term[n_cells-1] = 1
+            # RHS_left_term[-1] = 1
+            # A[-1] = 1
         #right_term = generate_ionic_current(phi_now, ...)
         #right_term = generate_ionic_dummy(phi_now)
         #soln_term = left_term + right_term
         soln_term = RHS_left_term
-        phi_next = np.linalg.solve(A, soln_term)
+        # phi_next = np.linalg.solve(A, soln_term)
+        phi_next = np.linalg.lstsq(A, soln_term)
 
         # set up for next iteration 
-        phi_now = phi_next
+        phi_now = phi_next[0]
 
 def main():
     # Prep work 
     # Create the strand first
-    n_cells = 10
+    n_cells = 80
     delta_x = 0.01
     delta_t = 0.01
-    J = 100 # TODO find this 
-    S = 0.1
+    J = -3.62*(10**-5) 
+    cell_len = 1
+    S = 4*cell_len**2 + (2*cell_len**2)/36
+
     phi_resting = -70
+    sigma = create_sigma(cell_len) 
     strand = create_strand(n_cells, phi_resting)
     print(strand)
 
     #TODO : make sure the integral is proper
     integral = generate_integral(phi_resting)
 
-    A_84 = create_A_84(delta_x, n_cells, J, S, delta_t)
-    B_84 = create_B_84(delta_x, n_cells, J, S, delta_t)
+    A_84 = create_A_84(delta_x, n_cells, J, S, delta_t, sigma)
+    B_84 = create_B_84(delta_x, n_cells, J, S, delta_t, sigma)
     A_83 = create_A_83(delta_x, n_cells, S, delta_t, integral)
     B_83 = create_B_83(delta_x, n_cells, S, delta_t, integral)
 
     A_comb = np.concatenate((A_83, A_84))
     B_comb = np.concatenate((B_83, B_84))
 
+    A_comb = np.identity(2*n_cells) # the negative sign causes oscillation?
+
     # Simulate
     simulate(A_comb, B_comb, strand, n_cells)
 
-    os.system("ffmpeg -y -i 'foo%03d.jpg' microdomain.mp4")
+    os.system("ffmpeg -y -i 'timestep%d.jpg' microdomain.mp4")
     # os.system("rm -f *.jpg")
 
 

@@ -83,7 +83,7 @@ def nondimenionsinalize_gin(v):
 def generate_integral(v_resting):
     """v_resting = -70"""
     gin_nondim = nondimenionsinalize_gin(v_resting)
-    return 2 * gin_nondim
+    return gin_nondim /18
 
 def main():
     print(nondimenionsinalize_gin(-70))
