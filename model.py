@@ -39,9 +39,16 @@ def simulate(A, B, strand, n_cells):
     phi_now = strand
     transmembrane_transform = create_B(n_cells)
 
+    #replacement_row = np.ones(n_cells*2)
+   # replacement_row[n_cells+1:] = 0
+    #A[1] = replacement_row
+    #print(replacement_row)
+
+    print(np.linalg.matrix_rank(A))
+
     for i in range(100):
         # stimulus
-        if i < 1:
+        if i < 5:
             # phi_now[0] = -70
             # phi_now[n_cells-1] = -70
             phi_now[n_cells] = -40
@@ -56,6 +63,7 @@ def simulate(A, B, strand, n_cells):
             plt.title('time = ' + str(i/100))
             plt.savefig('timestep'+str(i)+'.jpg')
             plt.clf()
+            print("i: " + str(i))
             print(phi_trans)
         RHS_left_term = np.matmul(B, phi_now)
         # if i == 0:
@@ -67,7 +75,8 @@ def simulate(A, B, strand, n_cells):
         #right_term = generate_ionic_dummy(phi_now)
         #soln_term = left_term + right_term
         soln_term = RHS_left_term
-        # phi_next = np.linalg.solve(A, soln_term)
+        #soln_term[1] = 1
+        #phi_next = np.linalg.solve(A, soln_term)
         phi_next = np.linalg.lstsq(A, soln_term)
 
         # set up for next iteration 
@@ -77,8 +86,8 @@ def main():
     # Prep work 
     # Create the strand first
     n_cells = 80
-    delta_x = 0.01
-    delta_t = 0.01
+    delta_x = .01
+    delta_t = .01
     J = -3.62*(10**-5) 
     cell_len = 1
     S = 4*cell_len**2 + (2*cell_len**2)/36
@@ -91,15 +100,15 @@ def main():
     #TODO : make sure the integral is proper
     integral = generate_integral(phi_resting)
 
-    A_84 = create_A_84(delta_x, n_cells, J, S, delta_t, sigma)
-    B_84 = create_B_84(delta_x, n_cells, J, S, delta_t, sigma)
-    A_83 = create_A_83(delta_x, n_cells, S, delta_t, integral)
-    B_83 = create_B_83(delta_x, n_cells, S, delta_t, integral)
+    A_84 = create_A_84(delta_x, n_cells, J, S, delta_t)
+    B_84 = create_B_84(delta_x, n_cells, J, S, delta_t)
+    A_83 = create_A_83(delta_x, n_cells, S, delta_t, integral, sigma)
+    B_83 = create_B_83(delta_x, n_cells, S, delta_t, integral, sigma)
 
     A_comb = np.concatenate((A_83, A_84))
     B_comb = np.concatenate((B_83, B_84))
 
-    A_comb = np.identity(2*n_cells) # the negative sign causes oscillation?
+    #A_comb = np.identity(2*n_cells) # the negative sign causes oscillation?
 
     # Simulate
     simulate(A_comb, B_comb, strand, n_cells)

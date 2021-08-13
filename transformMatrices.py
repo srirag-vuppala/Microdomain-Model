@@ -2,26 +2,26 @@ import numpy as np
 from utilities import *
 
 
-def create_A_84(delta_x, n_nodes, J, S, delta_t, sigma):
+def create_A_84(delta_x, n_nodes, J, S, delta_t):
     Z = create_Z(delta_x, n_nodes)
     B = create_B(n_nodes)
-    return (J*Z*sigma) - (S*B/delta_t) 
+    return (J*Z) - (S*B/delta_t)
 
-def create_B_84(delta_x, n_nodes, J, S, delta_t, sigma):
+def create_B_84(delta_x, n_nodes, J, S, delta_t):
     Z = create_Z(delta_x, n_nodes)
     B = create_B(n_nodes)
-    return (-S*B*sigma/delta_t) - (J*Z)
+    return (-S*B/delta_t) - (J*Z)
 
-def create_A_83(delta_x, n_nodes, S, delta_t, integral):
+def create_A_83(delta_x, n_nodes, S, delta_t, integral, sigma):
     """ The coeff matrix of the LHS in 83"""
-    term_1 = create_A(delta_x, n_nodes)/2
+    term_1 = sigma * create_A(delta_x, n_nodes)/2
     term_2 = S*create_B(n_nodes)/delta_t
     term_3 = create_G(n_nodes, integral)/2
     return term_1 - term_2 - term_3
 
-def create_B_83(delta_x, n_nodes, S, delta_t , integral):
+def create_B_83(delta_x, n_nodes, S, delta_t , integral, sigma):
     """ The coeff matrix of the RHS in 83"""
-    term_1 = create_A(delta_x, n_nodes)/2
+    term_1 = sigma * create_A(delta_x, n_nodes)/2
     term_2 = S*create_B(n_nodes)/delta_t
     term_3 = create_G(n_nodes, integral)/2
     return term_3 - term_1 - term_2
