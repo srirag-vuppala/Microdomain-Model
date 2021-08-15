@@ -78,6 +78,9 @@ def nondimenionsinalize_gin(v):
     gin_nondim = R_m * 666
     return gin_nondim
 
+def rm(v_resting):
+    return 1 / dI_dv(v_resting)
+
 
 """run this function to get the integral parameter everything else is a helper function"""
 def generate_integral(v_resting):

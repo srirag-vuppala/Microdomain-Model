@@ -4,12 +4,13 @@
 # Imports 
 import numpy as np
 
-from integral import generate_integral
+from integral import *
 from utilities import *
 from transformMatrices import *
 import os
 import hh
 import matplotlib.pyplot as plt
+from ionic_current_cubic import *
 
 # Prints the arrays properly with elements as X.YYY
 np.set_printoptions(precision=3)
@@ -35,25 +36,28 @@ def generate_ionic_dummy(v):
     return np.asarray(hh.HodgkinHuxley().main(v))
 
 
-def simulate(A, B, strand, n_cells):
+def simulate(A, B, strand, n_cells, delta_v, phi_resting, a):
     phi_now = strand
     transmembrane_transform = create_B(n_cells)
 
     replacement_row = np.ones(n_cells*2)
     replacement_row[n_cells+1:] = 0
+    replacement_row_2 = np.ones(n_cells*2)
+    replacement_row_2[:n_cells+1] = 0
     A[0] = replacement_row
+    #A[-1] = replacement_row_2
     #print(replacement_row)
 
-    print(np.linalg.matrix_rank(A))
+    print("Rank of A: " + str(np.linalg.matrix_rank(A)))
 
     for i in range(1000):
         # stimulus
         if i < 5:
             # phi_now[0] = -70
             # phi_now[n_cells-1] = -70
-            phi_now[n_cells] = -40
-            phi_now[-1] = 40
-        if i < 200:
+            phi_now[n_cells] = -40/delta_v
+            phi_now[-1] = 40/delta_v
+        if i < 200 or i % 100 == 0 or i == 999:
             # plt.scatter(np.arange(1, 11, 1), np.matmul(create_B(n_cells), phi_now))
             phi_trans = np.matmul(transmembrane_transform, phi_now)
             plt.plot(np.arange(1, n_cells+1, 1), phi_trans)
@@ -71,10 +75,12 @@ def simulate(A, B, strand, n_cells):
             # RHS_left_term[-1] = 1
             # A[-1] = 1
         #right_term = generate_ionic_current(phi_now, ...)
-        #right_term = generate_ionic_dummy(phi_now)
-        #soln_term = left_term + right_term
+        #right_term = generate_ionic_dummy(phi_now*delta_v)
+        #right_term = generate_cubic_integral(phi_resting, a)
+        #soln_term = RHS_left_term + right_term
         soln_term = RHS_left_term
         soln_term[0] = 1
+        #soln_term[-1] = 1
         phi_next = np.linalg.solve(A, soln_term)
         #phi_next = np.linalg.lstsq(A, soln_term)
 
@@ -84,6 +90,9 @@ def simulate(A, B, strand, n_cells):
 def main():
     # Prep work 
     # Create the strand first
+    a = .5
+    delta_v = 120
+    phi_resting = -70/delta_v
     n_cells = 80
     delta_x = .01
     delta_t = .01
@@ -91,13 +100,13 @@ def main():
     cell_len = 1
     S = 4*cell_len**2 + (2*cell_len**2)/36
 
-    phi_resting = -70
     sigma = create_sigma(cell_len) 
     strand = create_strand(n_cells, phi_resting)
     print(strand)
 
     #TODO : make sure the integral is proper
-    integral = generate_integral(phi_resting)
+    #integral = generate_integral(phi_resting * delta_v)
+    integral = generate_cubic_integral(phi_resting, a)
 
     A_84 = create_A_84(delta_x, n_cells, J, S, delta_t)
     B_84 = create_B_84(delta_x, n_cells, J, S, delta_t)
@@ -110,7 +119,7 @@ def main():
     #A_comb = np.identity(2*n_cells) # the negative sign causes oscillation?
 
     # Simulate
-    simulate(A_comb, B_comb, strand, n_cells)
+    simulate(A_comb, B_comb, strand, n_cells, delta_v, phi_resting, a)
 
     os.system("ffmpeg -y -i 'timestep%d.jpg' microdomain.mp4")
     # os.system("rm -f *.jpg")

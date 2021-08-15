@@ -1,4 +1,5 @@
 import numpy as np
+from integral import *
 
 class HodgkinHuxley():
     C_m = 1.0
