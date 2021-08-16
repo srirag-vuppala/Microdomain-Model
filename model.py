@@ -52,14 +52,20 @@ def simulate(A, B, strand, n_cells, delta_v, phi_resting, a):
 
     for i in range(1000):
         # stimulus
+        intra, extra = split_list(phi_now)
         if i < 5:
+            extra[0] = -40
+            extra[-1] = 40
             # phi_now[0] = -70
             # phi_now[n_cells-1] = -70
-            phi_now[n_cells] = -40/delta_v
-            phi_now[-1] = 40/delta_v
+            # phi_now[n_cells] = -40/delta_v
+            # phi_now[-1] = 40/delta_v
+        
+        phi_trans = intra - extra
+        phi_now = join_list(intra, extra)
         if i < 200 or i % 100 == 0 or i == 999:
             # plt.scatter(np.arange(1, 11, 1), np.matmul(create_B(n_cells), phi_now))
-            phi_trans = np.matmul(transmembrane_transform, phi_now)
+            # phi_trans = np.matmul(transmembrane_transform, phi_now)
             plt.plot(np.arange(1, n_cells+1, 1), phi_trans)
             plt.xlabel('Node')
             plt.ylabel('Transmembrane Potential')
@@ -79,7 +85,7 @@ def simulate(A, B, strand, n_cells, delta_v, phi_resting, a):
         #right_term = generate_cubic_integral(phi_resting, a)
         #soln_term = RHS_left_term + right_term
         soln_term = RHS_left_term
-        soln_term[0] = 1
+        # soln_term[0] = 1
         #soln_term[-1] = 1
         phi_next = np.linalg.solve(A, soln_term)
         #phi_next = np.linalg.lstsq(A, soln_term)

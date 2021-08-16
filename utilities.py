@@ -58,6 +58,10 @@ def split_list(a_list):
     half = len(a_list)//2
     return a_list[:half], a_list[half:]
 
+def join_list(A, B):
+    return np.concatenate((A, B))
+
+
 
 def create_block_diag_matrix(A, B):
     # block diagonal form 
@@ -72,7 +76,9 @@ def create_block_diag_matrix(A, B):
 
 
 def main():
-    arr = np.zeros([4,4])
+    arr = np.ones(4)
+    print(arr)
+    print(join_list(arr, arr))
 
 
 if __name__ == '__main__':
