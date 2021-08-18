@@ -44,7 +44,7 @@ def simulate(A, B, strand, n_cells, delta_v, phi_resting, a):
     replacement_row[n_cells+1:] = 0
     replacement_row_2 = np.ones(n_cells*2)
     replacement_row_2[:n_cells+1] = 0
-    A[0] = replacement_row
+    # A[0] = replacement_row
     #A[-1] = replacement_row_2
     #print(replacement_row)
 
@@ -54,12 +54,8 @@ def simulate(A, B, strand, n_cells, delta_v, phi_resting, a):
         # stimulus
         intra, extra = split_list(phi_now)
         if i < 5:
-            extra[0] = -40
-            extra[-1] = 40
-            # phi_now[0] = -70
-            # phi_now[n_cells-1] = -70
-            # phi_now[n_cells] = -40/delta_v
-            # phi_now[-1] = 40/delta_v
+            extra[0] += -100
+            extra[-1] += 100
         
         phi_trans = intra - extra
         phi_now = join_list(intra, extra)
@@ -99,31 +95,33 @@ def main():
     a = .5
     delta_v = 120
     phi_resting = -70/delta_v
-    n_cells = 80
-    delta_x = .01
-    delta_t = .01
+    n_cells = 100
+    delta_x = 0.1
+    delta_t = 1
     J = -3.62*(10**-5) 
     cell_len = 1
     S = 4*cell_len**2 + (2*cell_len**2)/36
 
-    sigma = create_sigma(cell_len) 
     strand = create_strand(n_cells, phi_resting)
     print(strand)
 
     #TODO : make sure the integral is proper
-    #integral = generate_integral(phi_resting * delta_v)
-    integral = generate_cubic_integral(phi_resting, a)
+    integral = generate_integral(phi_resting * delta_v)
+    #integral = generate_cubic_integral(phi_resting, a)
 
     A_84 = create_A_84(delta_x, n_cells, J, S, delta_t)
     B_84 = create_B_84(delta_x, n_cells, J, S, delta_t)
-    A_83 = create_A_83(delta_x, n_cells, S, delta_t, integral, sigma)
-    B_83 = create_B_83(delta_x, n_cells, S, delta_t, integral, sigma)
+    A_83 = create_A_83(delta_x, n_cells, S, delta_t, integral, cell_len)
+    B_83 = create_B_83(delta_x, n_cells, S, delta_t, integral, cell_len)
 
     A_comb = np.concatenate((A_83, A_84))
+    A_comb = np.where(A_comb == -0,0, A_comb )
     B_comb = np.concatenate((B_83, B_84))
 
-    #A_comb = np.identity(2*n_cells) # the negative sign causes oscillation?
+    # A_comb = np.identity(2*n_cells) # the negative sign causes oscillation?
 
+    matprint(A_comb)
+    matprint(B_comb)
     # Simulate
     simulate(A_comb, B_comb, strand, n_cells, delta_v, phi_resting, a)
 
