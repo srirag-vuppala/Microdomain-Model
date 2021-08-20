@@ -27,18 +27,21 @@ def create_B_83(delta_x, n_nodes, S, delta_t , integral, cell_len):
     return term_3 - term_1 - term_2
 
 def create_Z(delta_x, n_nodes):
+    """ Z = [0 L_3] """
     L_3 = create_L_3(delta_x, n_nodes)
     # L_3 = create_L_2(delta_x, n_nodes, 1)
     zero = np.zeros([n_nodes, n_nodes])
     return np.concatenate((zero, L_3), axis=1)
 
 def create_G(n_nodes, integral):
+    """ G = gap_junctional_integral * [E 0] """
     # E = create_E(n_nodes)
     E = np.identity(n_nodes) 
     zero = np.zeros([n_nodes, n_nodes])
     return integral*np.concatenate((E, zero), axis=1)
 
 def create_E(n_nodes):
+    """ matrix representing phi_i - phi_n """
     E = np.diagflat([2 for _ in range(n_nodes)], 0) + np.diagflat([-1 for _ in range(n_nodes-1)], -1) + np.diagflat([-1 for _ in range(n_nodes-1)], 1)
     E[0][0] = 1
     E[-1][-1] = 1
