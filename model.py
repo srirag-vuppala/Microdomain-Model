@@ -40,6 +40,7 @@ def simulate(A, B, strand, n_cells, delta_v, phi_resting, a):
     phi_now = strand
     transmembrane_transform = create_B(n_cells)
 
+    # row control to make A full rank
     replacement_row = np.ones(n_cells*2)
     replacement_row[n_cells+1:] = 0
     replacement_row_2 = np.ones(n_cells*2)
