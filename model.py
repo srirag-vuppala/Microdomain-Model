@@ -56,13 +56,7 @@ def simulate(A, B, strand, n_cells, delta_v, phi_resting, a):
         phi_now = join_list(intra, extra)
 
         if i < 200 or i % 100 == 0 or i == 999:
-            # plt.scatter(np.arange(1, 11, 1), np.matmul(create_B(n_cells), phi_now))
-            plt.plot(np.arange(1, n_cells+1, 1), phi_trans)
-            plt.xlabel('Node')
-            plt.ylabel('Transmembrane Potential')
-            plt.title('time = ' + str(i/100))
-            plt.savefig('timestep'+str(i)+'.jpg')
-            plt.clf()
+            display_plot(n_cells, phi_trans, i)
             print("i: " + str(i))
             print(phi_trans)
 
@@ -92,7 +86,7 @@ def main():
     a = .5
     delta_v = 120
     phi_resting = -70/delta_v
-    n_cells = 5
+    n_cells = 50
     delta_x = 0.1
     delta_t = 1
     J = -3.62*(10**-5) 
@@ -113,14 +107,14 @@ def main():
 
     A_comb = np.concatenate((A_83, A_84))
     A_comb = np.where(A_comb == -0,0, A_comb )
-    B_comb = np.concatenate((B_83, B_84), axis=1)
+    B_comb = np.concatenate((B_83, B_84))
 
     # A_comb = np.identity(2*n_cells) 
 
     matprint(A_comb)
     matprint(B_comb)
     # Simulate
-    # simulate(A_comb, B_comb, strand, n_cells, delta_v, phi_resting, a)
+    simulate(A_comb, B_comb, strand, n_cells, delta_v, phi_resting, a)
 
     os.system("ffmpeg -y -i 'timestep%d.jpg' microdomain.mp4")
     # to delete the images run this command "rm -f *.jpg" in the terminal. Make sure you are in the right directory/folder.

@@ -44,10 +44,10 @@ def check_laplace_matrix(L):
         print("yay it works")    
     else:
         print("Try again")
-
-def display_plot(V, c):
-    plt.figure(i%100 + 1)
-    plt.scatter(np.arange(1, 11, 1), np.matmul(create_B(10), phi_now))
+    
+def display_plot(n_cells, phi_trans, i):
+    # plt.scatter(np.arange(1, 11, 1), np.matmul(create_B(n_cells), phi_now))
+    plt.plot(np.arange(1, n_cells+1, 1), phi_trans)
     plt.xlabel('Node')
     plt.ylabel('Transmembrane Potential')
     plt.title('time = ' + str(i/100))
